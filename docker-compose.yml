@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+  api-node:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    image: node:13.7-alpine
+    container_name: login-sample
+    ports:
+      - 3001:3000
+    volumes:
+      - .:/home/node/app
+      - node_modules:/home/node/app/node_modules
+    networks:
+      - app-net
+    command: /home/node/app/node_modules/.bin/nodemon src/server.js
+    depends_on:
+      - test-db
+
+  test-db:
+    image: postgres:12-alpine
+    environment:
+      POSTGRES_DB: login_sample
+      POSTGRES_PASSWORD: senha123
+    ports:
+      - 15432:5432
+    volumes:
+      - test_db_data:/data/test_db
+    networks:
+      - app-net
+
+networks:
+  app-net:
+    driver: bridge
+
+volumes:
+  test_db_data:
+  node_modules:
